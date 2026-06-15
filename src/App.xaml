@@ -1,0 +1,8 @@
+<Application x:Class="LANSpark.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="UI/MainWindow.xaml">
+    <Application.Resources>
+         <!-- منابع سراسری برنامه در صورت وجود در اینجا قرار می‌گیرند -->
+    </Application.Resources>
+</Application>
