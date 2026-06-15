@@ -5,33 +5,40 @@ using System.Collections.Generic;
 
 namespace LANSpark.Core.Config
 {
+    // کلاس مدل برای پوشه‌های اشتراک‌گذاری شده با امکانات کنترلی پیشرفته
+    public class SharedFolder
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string FolderPath { get; set; } = string.Empty;
+        public string FolderName => Path.GetFileName(FolderPath);
+        public bool IsPublic { get; set; } = true; // عمومی برای همه یا خصوصی
+        public string TargetMachineId { get; set; } = string.Empty; // در صورت خصوصی بودن، آی‌دی سیستم مقصد
+        public bool IsPaused { get; set; } = false; // توقف موقتی اشتراک‌گذاری
+    }
+
     public class AppConfig
     {
-        // تنظیمات عمومی و زبان
+        // تنظیمات کاربری
         public string Language { get; set; } = "fa"; // "fa" یا "en"
         public string AppTheme { get; set; } = "Dark"; // "Dark" یا "Light"
 
-        // تنظیمات انتقال فایل (برای سرعت بالا)
+        // تنظیمات درگاه‌های شبکه
         public int TransferPort { get; set; } = 45055;
-        public int ChunkSize { get; set; } = 65536; // 64KB برای افزایش راندمان بافرینگ
-        public int MaxParallelConnections { get; set; } = 8; // شبیه‌ساز رفتار دانلود منیجر
-        public bool EnableCompression { get; set; } = true; // فشرده‌سازی در حین انتقال
+        public int ChunkSize { get; set; } = 65536; 
+        public int MaxParallelConnections { get; set; } = 8; 
+        public bool EnableCompression { get; set; } = true; 
 
-        // تنظیمات چت امن و شبکه
         public int ChatPort { get; set; } = 45056;
-        public string ChatProtocol { get; set; } = "TLS_TCP"; // "TLS_TCP" به عنوان جایگزین مطمئن یا "gRPC"
-        public bool EncryptChat { get; set; } = true;
+        public string ChatProtocol { get; set; } = "TLS_TCP"; 
         
-        // تنظیمات اشتراک‌گذاری پیش‌فرض ویندوز (SMB)
         public bool AutoEnableWindowsSMB { get; set; } = true;
         public string DefaultWindowsShareName { get; set; } = "LANSparkShare";
 
-        // لیست پوشه‌های اشتراک‌گذاری شده سفارشی در داخل خود اپلیکیشن
-        public List<string> LocalSharedDirectories { get; set; } = new List<string>();
+        // لیست پیشرفته پوشه‌های به اشتراک گذاشته شده در نرم‌افزار
+        public List<SharedFolder> SharedFolders { get; set; } = new List<SharedFolder>();
 
         private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
-        // متد ذخیره تنظیمات روی فایل JSON
         public void Save()
         {
             try
@@ -42,12 +49,10 @@ namespace LANSpark.Core.Config
             }
             catch (Exception ex)
             {
-                // به منظور سادگی خطایابی، در بدنه اصلی لاگ خواهد شد
                 Console.WriteLine($"Error saving configuration: {ex.Message}");
             }
         }
 
-        // متد لود تنظیمات از روی فایل JSON
         public static AppConfig Load()
         {
             try
