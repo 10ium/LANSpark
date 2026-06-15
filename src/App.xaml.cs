@@ -6,12 +6,13 @@ namespace LANSpark
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    // استفاده صریح از فضای نام سیستم راه‌انداز WPF برای برطرف کردن ابهام نهایی کامپایلر
+    public partial class App : System.Windows.Application
     {
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            // در صورت نیاز، کدهای آماده‌سازی اولیه قبل از باز شدن فرم در اینجا قرار می‌گیرند.
+            // کدهای آماده‌سازی اولیه در صورت نیاز در اینجا اجرا می‌شوند
         }
     }
 }
