@@ -13,7 +13,7 @@
     <AssemblyName>LANSpark</AssemblyName>
     <RootNamespace>LANSpark</RootNamespace>
     
-    <!-- ۳. مشخص کردن مسیر آیکون اصلی نرم‌افزار جهت حک شدن روی فایل EXE -->
+    <!-- ۳. فعال‌سازی مجدد و دایمی آیکون ساخته شده داینامیک در فایل خروجی EXE -->
     <ApplicationIcon>UI\Resources\app_icon.ico</ApplicationIcon>
     
     <!-- اطلاعات بیلد نرم‌افزار -->
@@ -23,7 +23,7 @@
     <Description>Enterprise-Grade Multi-Connection LAN Sharing with End-to-End TLS 1.3 Chat</Description>
   </PropertyGroup>
 
-  <!-- ۴. نگهداری آیکون به عنوان منبع خروجی بدون مداخله در فایل‌های ژنریک XAML -->
+  <!-- معرفی فایل آیکون پویا به کامپایلر به عنوان منبع بیلد -->
   <ItemGroup>
     <Resource Include="UI\Resources\app_icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
