@@ -1,0 +1,231 @@
+<Window x:Class="LANSpark.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{DynamicResource AppName}" Height="650" Width="950"
+        Background="#121212" Foreground="#E0E0E0"
+        WindowStartupLocation="CenterScreen" SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <!-- استایل مدرن دکمه‌ها -->
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#005A9E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- استایل کارت‌های پس‌زمینه -->
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="BorderBrush" Value="#2D2D30"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- بخش هدر برنامه -->
+            <RowDefinition Height="Auto"/>
+            <!-- بخش تب‌های اصلی -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ۱. هدر اصلی برنامه -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{DynamicResource AppName}" FontSize="26" FontWeight="Bold" Foreground="#0078D4"/>
+                <TextBlock Text="{DynamicResource Subtitle}" FontSize="12" Foreground="#888888" Margin="0,3,0,0"/>
+            </StackPanel>
+
+            <!-- اطلاعات هویت سیستم جاری -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="{DynamicResource LabelComputerName}" Foreground="#888888" VerticalAlignment="Center" Margin="5"/>
+                <TextBox x:Name="TxtLocalName" Text="MyPC" Background="#2D2D30" Foreground="White" BorderThickness="0" Padding="5,3" Width="120" Margin="5" VerticalAlignment="Center"/>
+                <Button Style="{StaticResource ModernButtonStyle}" Content="{DynamicResource BtnCopy}" Click="BtnCopyIp_Click" Margin="5" Padding="10,5"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ۲. ساختار تب‌های برنامه -->
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <!-- تب انتقال فایل -->
+            <TabItem Header="{DynamicResource TabTransfer}">
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- لیست سیستم‌های آنلاین متصل در شبکه -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Computers Online" FontSize="14" FontWeight="Bold" Margin="0,0,0,10" Foreground="#0078D4"/>
+                            <ListBox x:Name="LstPeers" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#252526" CornerRadius="4" Padding="10" Margin="0,3">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding CustomName}" FontWeight="Bold" Foreground="White"/>
+                                                    <TextBlock Text="{Binding IpAddress}" FontSize="11" Foreground="#888888"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Content="Copy IP" Style="{StaticResource ModernButtonStyle}" Padding="6,2" FontSize="10" Click="BtnCopyPeerIp_Click" CommandParameter="{Binding IpAddress}"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+
+                    <!-- پنل مدیریت دانلود و سرچ فایل -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- کادر سرچ و دکمه اشتراک‌گذاری پوشه جدید -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TxtSearch" Grid.Column="0" Background="#1E1E1E" Foreground="White" BorderBrush="#2D2D30" BorderThickness="1" Padding="8" Margin="0,0,5,0"/>
+                            <Button Grid.Column="1" Content="{DynamicResource BtnSearch}" Style="{StaticResource ModernButtonStyle}" Margin="0,0,5,0" Width="80"/>
+                            <Button Grid.Column="2" Content="{DynamicResource BtnAddShare}" Style="{StaticResource ModernButtonStyle}" Click="BtnAddShare_Click"/>
+                        </Grid>
+
+                        <!-- مانیتورینگ پیشرفت دانلود (مانند IDM) -->
+                        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10" Height="90">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="LblCurrentTransferFile" Text="No Active Download" FontWeight="Bold"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Content="{DynamicResource BtnPause}" Style="{StaticResource ModernButtonStyle}" Padding="8,2" Margin="3,0" FontSize="10"/>
+                                        <Button Content="{DynamicResource BtnCancel}" Style="{StaticResource ModernButtonStyle}" Padding="8,2" Margin="3,0" FontSize="10" Background="#960000"/>
+                                    </StackPanel>
+                                </Grid>
+                                <ProgressBar x:Name="PrgTransfer" Grid.Row="1" Height="15" Background="#2D2D30" Foreground="#0078D4" Margin="0,5,0,0" Value="45"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- فضای جستجوی فایل‌های شبکه -->
+                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+                            <ListView x:Name="LstSharedFiles" Background="Transparent" BorderThickness="0">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="{DynamicResource ColFileName}" Width="250" DisplayMemberBinding="{Binding Name}"/>
+                                        <GridViewColumn Header="Size" Width="100" DisplayMemberBinding="{Binding Size}"/>
+                                        <GridViewColumn Header="Owner" Width="120" DisplayMemberBinding="{Binding Path}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- تب چت رمزنگاری شده -->
+            <TabItem Header="{DynamicResource TabChat}">
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+                        <RichTextBox x:Name="RtbChatLog" Background="Transparent" Foreground="White" BorderThickness="0" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+                    </Border>
+                    
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="TxtMessageInput" Grid.Column="0" Background="#1E1E1E" Foreground="White" BorderBrush="#2D2D30" BorderThickness="1" Padding="10" Margin="0,0,10,0"/>
+                        <Button Grid.Column="1" Content="{DynamicResource BtnSend}" Style="{StaticResource ModernButtonStyle}" Width="100" Click="BtnSendChat_Click"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- تب تنظیمات کلی -->
+            <TabItem Header="{DynamicResource TabSettings}">
+                <Border Style="{StaticResource CardBorderStyle}" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource HeadingPreferences}" FontSize="18" FontWeight="Bold" Margin="0,0,0,20" Foreground="#0078D4"/>
+
+                        <!-- انتخاب زبان -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelLanguage}" VerticalAlignment="Center" FontSize="14"/>
+                            <ComboBox x:Name="CmbLanguage" Grid.Column="1" Background="#2D2D30" Foreground="White" Padding="5" SelectionChanged="CmbLanguage_SelectionChanged">
+                                <ComboBoxItem Content="English" IsSelected="True"/>
+                                <ComboBoxItem Content="فارسی"/>
+                            </ComboBox>
+                        </Grid>
+
+                        <!-- مدیریت وضعیت اشتراک ویندوز SMB -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelAutoSmb}" VerticalAlignment="Center" FontSize="14"/>
+                            <CheckBox x:Name="ChkSmbStatus" Grid.Column="1" VerticalAlignment="Center" Checked="ChkSmb_Checked" Unchecked="ChkSmb_Unchecked"/>
+                        </Grid>
+
+                        <!-- بررسی به روز رسانی -->
+                        <Button Content="{DynamicResource BtnCheckUpdate}" Style="{StaticResource ModernButtonStyle}" Width="200" HorizontalAlignment="Left" Margin="0,20,0,0" Click="BtnCheckUpdates_Click"/>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
