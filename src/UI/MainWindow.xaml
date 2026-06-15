@@ -290,7 +290,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <Grid.ColumnDefinitions Width="180"/>
+                                <ColumnDefinition Width="180"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Chat Destination: " VerticalAlignment="Center" Foreground="{DynamicResource ColorTextPrimary}" Margin="0,0,10,0"/>
                             <ComboBox x:Name="CmbChatTarget" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}">
@@ -325,8 +325,8 @@
                         <!-- انتخاب زبان -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
-                                <Grid.ColumnDefinitions Width="200"/>
-                                <Grid.ColumnDefinitions Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{DynamicResource LabelLanguage}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <ComboBox x:Name="CmbLanguage" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}" Padding="5" SelectionChanged="CmbLanguage_SelectionChanged">
@@ -338,8 +338,8 @@
                         <!-- انتخاب پوسته هوشمند دارک/لایت -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
-                                <Grid.ColumnDefinitions Width="200"/>
-                                <Grid.ColumnDefinitions Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{DynamicResource LabelTheme}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <ComboBox x:Name="CmbTheme" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}" Padding="5" SelectionChanged="CmbTheme_SelectionChanged">
@@ -351,8 +351,8 @@
                         <!-- مدیریت وضعیت اشتراک ویندوز SMB -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
-                                <Grid.ColumnDefinitions Width="200"/>
-                                <Grid.ColumnDefinitions Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{DynamicResource LabelAutoSmb}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <CheckBox x:Name="ChkSmbStatus" Grid.Column="1" VerticalAlignment="Center" Checked="ChkSmb_Checked" Unchecked="ChkSmb_Unchecked"/>
