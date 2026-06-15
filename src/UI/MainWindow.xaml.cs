@@ -3,7 +3,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
@@ -152,12 +151,12 @@ namespace LANSpark.UI
             }
 
             TxtMessageInput.Clear();
-            AppendChatMessage("Me", message, Brushes.LightSkyBlue);
+            AppendChatMessage("Me", message, System.Windows.Media.Brushes.LightSkyBlue);
 
             bool success = await _chatService.SendMessageSecurelyAsync(selectedPeer.IpAddress, message);
             if (!success)
             {
-                AppendChatMessage("System", "Failed to send message. Peer might be offline.", Brushes.Red);
+                AppendChatMessage("System", "Failed to send message. Peer might be offline.", System.Windows.Media.Brushes.Red);
             }
         }
 
@@ -165,15 +164,16 @@ namespace LANSpark.UI
         {
             Dispatcher.Invoke(() =>
             {
-                AppendChatMessage(message.SenderName, message.MessageText, Brushes.LightGreen);
+                AppendChatMessage(message.SenderName, message.MessageText, System.Windows.Media.Brushes.LightGreen);
             });
         }
 
-        private void AppendChatMessage(string sender, string text, Brush color)
+        // رفع خطای تداخل قلم‌موها با استفاده از آدرس صریح سیستم ترسیم گرافیک WPF
+        private void AppendChatMessage(string sender, string text, System.Windows.Media.Brush color)
         {
             Paragraph para = new Paragraph();
             Run nameRun = new Run($"[{sender}] {DateTime.Now.ToShortTimeString()}: ") { Foreground = color, FontWeight = FontWeights.Bold };
-            Run textRun = new Run(text) { Foreground = Brushes.White };
+            Run textRun = new Run(text) { Foreground = System.Windows.Media.Brushes.White };
             para.Inlines.Add(nameRun);
             para.Inlines.Add(textRun);
             RtbChatLog.Document.Blocks.Add(para);
