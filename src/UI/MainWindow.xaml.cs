@@ -79,12 +79,14 @@ namespace LANSpark.UI
                 this.Resources.MergedDictionaries.Clear();
                 this.Resources.MergedDictionaries.Add(dictionary);
 
-                // تغییر راست‌چین یا چپ‌چین بودن کل پنجره
-                this.FlowDirection = langCode == "fa" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+                // اصلاح خطای انتساب جهت صفحه با آدرس صریح متغیرهای جهت ویندوز
+                this.FlowDirection = langCode == "fa" 
+                    ? System.Windows.FlowDirection.RightToLeft 
+                    : System.Windows.FlowDirection.LeftToRight;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Language loading error: {ex.Message}");
+                System.Windows.MessageBox.Show($"Language loading error: {ex.Message}");
             }
         }
 
@@ -101,21 +103,21 @@ namespace LANSpark.UI
             });
         }
 
-        // ۷. کپی آدرس آی‌پی سیستم‌ها به حافظه موقت (Clipboard)
+        // ۷. رفع ابهامات کپی آدرس آی‌پی با ارجاع صریح به کلیپ‌بورد و مسیج‌باکس WPF
         private void BtnCopyIp_Click(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetText(TxtLocalName.Text);
-            MessageBox.Show((string)this.FindResource("StatusCopied"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.Clipboard.SetText(TxtLocalName.Text);
+            System.Windows.MessageBox.Show((string)this.FindResource("StatusCopied"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnCopyPeerIp_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
+            var button = sender as System.Windows.Controls.Button; // رفع ابهام دکمه
             string? ip = button?.CommandParameter as string;
             if (!string.IsNullOrEmpty(ip))
             {
-                Clipboard.SetText(ip);
-                MessageBox.Show((string)this.FindResource("StatusCopied"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.Clipboard.SetText(ip);
+                System.Windows.MessageBox.Show((string)this.FindResource("StatusCopied"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -131,7 +133,7 @@ namespace LANSpark.UI
                     {
                         _config.LocalSharedDirectories.Add(path);
                         _config.Save();
-                        MessageBox.Show("Folder shared successfully within the app!", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
+                        System.Windows.MessageBox.Show("Folder shared successfully within the app!", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
@@ -146,7 +148,7 @@ namespace LANSpark.UI
             var selectedPeer = LstPeers.SelectedItem as PeerDevice;
             if (selectedPeer == null)
             {
-                MessageBox.Show("Please select a target computer from the list first.", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("Please select a target computer from the list first.", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -195,7 +197,7 @@ namespace LANSpark.UI
         {
             if (!_smbManager.IsUserAdministrator())
             {
-                MessageBox.Show("Administrator privileges are required to configure Windows Sharing.", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("Administrator privileges are required to configure Windows Sharing.", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ChkSmbStatus.IsChecked = false;
                 return;
             }
@@ -213,12 +215,12 @@ namespace LANSpark.UI
         // ۱۲. موتور بررسی آپدیت خودکار
         private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show((string)this.FindResource("MsgCheckingUpdates"), "LANSpark");
+            System.Windows.MessageBox.Show((string)this.FindResource("MsgCheckingUpdates"), "LANSpark");
             var (isNewAvailable, latestVersion, downloadUrl) = await _updateManager.CheckForUpdatesAsync();
 
             if (isNewAvailable)
             {
-                var result = MessageBox.Show((string)this.FindResource("MsgNewVersionFound") + $" ({latestVersion})", "LANSpark", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = System.Windows.MessageBox.Show((string)this.FindResource("MsgNewVersionFound") + $" ({latestVersion})", "LANSpark", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     await _updateManager.DownloadAndInstallUpdateAsync(downloadUrl);
@@ -226,7 +228,7 @@ namespace LANSpark.UI
             }
             else
             {
-                MessageBox.Show((string)this.FindResource("MsgNoUpdate"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show((string)this.FindResource("MsgNoUpdate"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
