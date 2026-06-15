@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- توکن‌های رنگی پایه‌ای تم دارک (تیره فلوئنت) -->
+    <SolidColorBrush x:Key="ColorAppBackground" Color="#121212"/>
+    <SolidColorBrush x:Key="ColorCardBackground" Color="#1E1E1E"/>
+    <SolidColorBrush x:Key="ColorCardBorder" Color="#2D2D30"/>
+    
+    <!-- متون (کنتراست بالا برای تم تیره) -->
+    <SolidColorBrush x:Key="ColorTextPrimary" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ColorTextSecondary" Color="#AAAAAA"/>
+    <SolidColorBrush x:Key="ColorTextMuted" Color="#777777"/>
+    
+    <!-- رنگ‌های شاخص و دکمه‌ها -->
+    <SolidColorBrush x:Key="ColorAccent" Color="#0078D4"/>
+    <SolidColorBrush x:Key="ColorAccentHover" Color="#005A9E"/>
+    <SolidColorBrush x:Key="ColorButtonForeground" Color="#FFFFFF"/>
+    
+    <!-- رنگ‌های کنترلی ترنسفر و پیغام‌های هشدار دهنده -->
+    <SolidColorBrush x:Key="ColorProgressBackground" Color="#2D2D30"/>
+    <SolidColorBrush x:Key="ColorWarningBackground" Color="#332B00"/>
+    <SolidColorBrush x:Key="ColorWarningBorder" Color="#FFCC00"/>
+    <SolidColorBrush x:Key="ColorWarningText" Color="#FFDD55"/>
+    <SolidColorBrush x:Key="ColorSystemMessage" Color="#00FF66"/>
+
+</ResourceDictionary>
