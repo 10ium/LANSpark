@@ -1,9 +1,15 @@
-name: Build and Release Windows App
+name: Build and Release LANSpark
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # اجرای خودکار با ثبت تگ جدید مانند v1.0.0
+  workflow_dispatch: # فعال‌سازی دکمه اجرای دستی (Run Workflow) در پنل گیت‌هاب
+    inputs:
+      custom_version:
+        description: 'Manual Version Number (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
 
 jobs:
   build:
@@ -19,23 +25,40 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore Dependencies
-      run: dotnet restore
+      run: dotnet restore src/LANSpark.csproj
 
-    # استخراج ورژن مستقیم از روی تگ گیت‌هاب و تزریق آن به کامپایلر به کمک سوئیچ -p:Version
+    # تشخیص هوشمند شماره نسخه بر اساس نوع اجرا (دستی یا خودکار با تگ)
+    - name: Determine Version
+      id: get_version
+      shell: pwsh
+      run: |
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $ver = "${{ github.event.inputs.custom_version }}"
+        } else {
+          $ver = "${{ github.ref_name }}".Replace("v", "")
+        }
+        echo "BUILD_VERSION=$ver" >> $env:GITHUB_ENV
+
+    # کامپایل برنامه به صورت یک فایل منفرد با تزریق نسخه و آیکون اختصاصی
     - name: Publish App
       shell: pwsh
       run: |
-        $version = "${{ github.ref_name }}".Replace("v", "")
-        dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:Version=$version -o ./publish
+        dotnet publish src/LANSpark.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:Version=${{ env.BUILD_VERSION }} -o ./publish
 
+    # فشرده‌سازی پکیج جهت انتشار پرتابل
     - name: Create Zip Package
       shell: pwsh
       run: |
-        Compress-Archive -Path ./publish/* -DestinationPath ./FileShareApp-Windows-Portable.zip
+        Compress-Archive -Path ./publish/* -DestinationPath ./LANSpark-v${{ env.BUILD_VERSION }}-Portable.zip
 
+    # ساخت ریلیز در گیت‌هاب و آپلود پکیج
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ./FileShareApp-Windows-Portable.zip
+        tag_name: v${{ env.BUILD_VERSION }}
+        name: LANSpark v${{ env.BUILD_VERSION }}
+        draft: false
+        prerelease: false
+        files: ./LANSpark-v${{ env.BUILD_VERSION }}-Portable.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
