@@ -4,15 +4,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="{DynamicResource AppName}" Height="650" Width="950"
-        Background="#121212" Foreground="#E0E0E0"
+        Title="{DynamicResource AppName}" Height="700" Width="1050"
+        Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}"
         WindowStartupLocation="CenterScreen" SnapsToDevicePixels="True">
 
     <Window.Resources>
-        <!-- استایل مدرن دکمه‌ها -->
-        <Style x:Key="ModernButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#0078D4"/>
-            <Setter Property="Foreground" Value="White"/>
+        <!-- استایل مدرن کارت‌های فلوئنت -->
+        <Style x:Key="ModernCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ColorCardBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ColorCardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <!-- استایل دکمه‌های شکیل برنامه -->
+        <Style x:Key="AccentButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource ColorAccent}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ColorButtonForeground}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="15,8"/>
             <Setter Property="FontSize" Value="12"/>
@@ -28,30 +38,21 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#005A9E"/>
+                    <Setter Property="Background" Value="{DynamicResource ColorAccentHover}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
-
-        <!-- استایل کارت‌های پس‌زمینه -->
-        <Style x:Key="CardBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="#1E1E1E"/>
-            <Setter Property="BorderBrush" Value="#2D2D30"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="15"/>
-        </Style>
     </Window.Resources>
 
-    <Grid Margin="10">
+    <Grid Margin="15">
         <Grid.RowDefinitions>
-            <!-- بخش هدر برنامه -->
+            <!-- هدر اصلی -->
             <RowDefinition Height="Auto"/>
-            <!-- بخش تب‌های اصلی -->
+            <!-- بخش محتوا -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ۱. هدر اصلی برنامه -->
+        <!-- ۱. هدر پیشرفته برنامه -->
         <Grid Grid.Row="0" Margin="0,0,0,15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -59,144 +60,267 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock Text="{DynamicResource AppName}" FontSize="26" FontWeight="Bold" Foreground="#0078D4"/>
-                <TextBlock Text="{DynamicResource Subtitle}" FontSize="12" Foreground="#888888" Margin="0,3,0,0"/>
+                <TextBlock Text="{DynamicResource AppName}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource ColorAccent}"/>
+                <TextBlock Text="{DynamicResource Subtitle}" FontSize="12" Foreground="{DynamicResource ColorTextSecondary}" Margin="0,3,0,0"/>
             </StackPanel>
 
-            <!-- اطلاعات هویت سیستم جاری -->
+            <!-- اطلاعات محلی بدون دکمه کپی برای نام سیستم -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource LabelComputerName}" Foreground="#888888" VerticalAlignment="Center" Margin="5"/>
-                <TextBox x:Name="TxtLocalName" Text="MyPC" Background="#2D2D30" Foreground="White" BorderThickness="0" Padding="5,3" Width="120" Margin="5" VerticalAlignment="Center"/>
-                <Button Style="{StaticResource ModernButtonStyle}" Content="{DynamicResource BtnCopy}" Click="BtnCopyIp_Click" Margin="5" Padding="10,5"/>
+                <TextBlock Text="{DynamicResource LabelComputerName}" Foreground="{DynamicResource ColorTextSecondary}" VerticalAlignment="Center" Margin="5"/>
+                <TextBlock x:Name="TxtLocalName" FontWeight="Bold" Foreground="{DynamicResource ColorTextPrimary}" VerticalAlignment="Center" Margin="5"/>
+                
+                <TextBlock Text="{DynamicResource LabelIpAddress}" Foreground="{DynamicResource ColorTextSecondary}" VerticalAlignment="Center" Margin="15,5,5,5"/>
+                <TextBlock x:Name="TxtLocalIp" FontWeight="Bold" Foreground="{DynamicResource ColorAccent}" VerticalAlignment="Center" Margin="5"/>
             </StackPanel>
         </Grid>
 
-        <!-- ۲. ساختار تب‌های برنامه -->
+        <!-- ۲. ساختار اصلی تب‌ها -->
         <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
-            <!-- تب انتقال فایل -->
+            
+            <!-- الف) انتقال فایل و صف دانلودهای موازی -->
             <TabItem Header="{DynamicResource TabTransfer}">
                 <Grid Margin="0,10,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280"/>
+                        <ColumnDefinition Width="300"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- لیست سیستم‌های آنلاین متصل در شبکه -->
-                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,10,0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="Computers Online" FontSize="14" FontWeight="Bold" Margin="0,0,0,10" Foreground="#0078D4"/>
-                            <ListBox x:Name="LstPeers" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#252526" CornerRadius="4" Padding="10" Margin="0,3">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0">
-                                                    <TextBlock Text="{Binding CustomName}" FontWeight="Bold" Foreground="White"/>
-                                                    <TextBlock Text="{Binding IpAddress}" FontSize="11" Foreground="#888888"/>
-                                                </StackPanel>
-                                                <Button Grid.Column="1" Content="Copy IP" Style="{StaticResource ModernButtonStyle}" Padding="6,2" FontSize="10" Click="BtnCopyPeerIp_Click" CommandParameter="{Binding IpAddress}"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </Grid>
-                    </Border>
-
-                    <!-- پنل مدیریت دانلود و سرچ فایل -->
-                    <Grid Grid.Column="1">
+                    <!-- ستون سیستم‌های آنلاین شبکه -->
+                    <Grid Grid.Column="0" Margin="0,0,12,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <!-- کادر سرچ و دکمه اشتراک‌گذاری پوشه جدید -->
-                        <Grid Grid.Row="0" Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox x:Name="TxtSearch" Grid.Column="0" Background="#1E1E1E" Foreground="White" BorderBrush="#2D2D30" BorderThickness="1" Padding="8" Margin="0,0,5,0"/>
-                            <Button Grid.Column="1" Content="{DynamicResource BtnSearch}" Style="{StaticResource ModernButtonStyle}" Margin="0,0,5,0" Width="80"/>
-                            <Button Grid.Column="2" Content="{DynamicResource BtnAddShare}" Style="{StaticResource ModernButtonStyle}" Click="BtnAddShare_Click"/>
-                        </Grid>
-
-                        <!-- مانیتورینگ پیشرفت دانلود (مانند IDM) -->
-                        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10" Height="90">
+                        <!-- لیست کلاینت‌ها -->
+                        <Border Grid.Row="0" Style="{StaticResource ModernCardStyle}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock x:Name="LblCurrentTransferFile" Text="No Active Download" FontWeight="Bold"/>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                        <Button Content="{DynamicResource BtnPause}" Style="{StaticResource ModernButtonStyle}" Padding="8,2" Margin="3,0" FontSize="10"/>
-                                        <Button Content="{DynamicResource BtnCancel}" Style="{StaticResource ModernButtonStyle}" Padding="8,2" Margin="3,0" FontSize="10" Background="#960000"/>
-                                    </StackPanel>
-                                </Grid>
-                                <ProgressBar x:Name="PrgTransfer" Grid.Row="1" Height="15" Background="#2D2D30" Foreground="#0078D4" Margin="0,5,0,0" Value="45"/>
+                                <TextBlock Grid.Row="0" Text="Computers Online" FontSize="15" FontWeight="Bold" Margin="0,0,0,10" Foreground="{DynamicResource ColorAccent}"/>
+                                <ListBox x:Name="LstPeers" Grid.Row="1" Background="Transparent" BorderThickness="0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource ColorAppBackground}" CornerRadius="6" Padding="10" Margin="0,4">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding CustomName}" FontWeight="Bold" Foreground="{DynamicResource ColorTextPrimary}"/>
+                                                        <TextBlock Text="{Binding IpAddress}" FontSize="11" Foreground="{DynamicResource ColorTextSecondary}"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="Copy IP" Style="{StaticResource AccentButtonStyle}" Padding="8,4" FontSize="10" Click="BtnCopyPeerIp_Click" CommandParameter="{Binding IpAddress}"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
                             </Grid>
                         </Border>
 
-                        <!-- فضای جستجوی فایل‌های شبکه -->
-                        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
-                            <ListView x:Name="LstSharedFiles" Background="Transparent" BorderThickness="0">
+                        <!-- بنر هوشمند گرافیکی زرد رنگ هشدار عدم اتصال شبکه (در صورت خالی بودن لیست) -->
+                        <Border x:Name="BrdNoNetworkWarn" Grid.Row="1" Background="{DynamicResource ColorWarningBackground}" BorderBrush="{DynamicResource ColorWarningBorder}" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,5,0,0" Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚠️" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="No active computers detected on the network. Check your Virtual VPN/LAN interface." FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource ColorWarningText}" Width="210"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- ستون سمت راست: لیست فایل‌ها و صف دانلودها -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="200"/> <!-- لیست فایل‌های شبکه -->
+                            <RowDefinition Height="*"/>   <!-- صف دانلود همزمان (IDM) -->
+                        </Grid.RowDefinitions>
+
+                        <!-- بخش جستجو -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TxtSearch" Grid.Column="0" Background="{DynamicResource ColorCardBackground}" Foreground="{DynamicResource ColorTextPrimary}" BorderBrush="{DynamicResource ColorCardBorder}" BorderThickness="1" Padding="10" Margin="0,0,8,0"/>
+                            <Button Grid.Column="1" Content="{DynamicResource BtnSearch}" Style="{StaticResource AccentButtonStyle}" Width="100"/>
+                        </Grid>
+
+                        <!-- لیست فایل‌های به اشتراک گذاشته شده همکاران در شبکه -->
+                        <Border Grid.Row="1" Style="{StaticResource ModernCardStyle}">
+                            <ListView x:Name="LstSharedFiles" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource ColorTextPrimary}">
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="{DynamicResource ColFileName}" Width="250" DisplayMemberBinding="{Binding Name}"/>
                                         <GridViewColumn Header="Size" Width="100" DisplayMemberBinding="{Binding Size}"/>
-                                        <GridViewColumn Header="Owner" Width="120" DisplayMemberBinding="{Binding Path}"/>
+                                        <GridViewColumn Header="Owner IP" Width="150" DisplayMemberBinding="{Binding Path}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
+                        </Border>
+
+                        <!-- صف پیشرفته و همزمان دانلودهای فعال (Multi-Download Queue) -->
+                        <Border Grid.Row="2" Style="{StaticResource ModernCardStyle}" Margin="0,8,0,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="Downloads Queue (Concurrent)" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource ColorAccent}" Margin="0,0,0,10"/>
+                                <ListView x:Name="LstDownloadsQueue" Grid.Row="1" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource ColorTextPrimary}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource ColorAppBackground}" CornerRadius="6" Padding="12" Margin="0,4" BorderThickness="1" BorderBrush="{DynamicResource ColorCardBorder}">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    
+                                                    <!-- سطر اطلاعات متادیتا دانلود -->
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding FileName}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                            <TextBlock Text=" - " Foreground="{DynamicResource ColorTextSecondary}"/>
+                                                            <TextBlock Text="{Binding SpeedString}" Foreground="{DynamicResource ColorSystemMessage}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                            <TextBlock Text=" - ETA: " Foreground="{DynamicResource ColorTextSecondary}" Margin="10,0,0,0"/>
+                                                            <TextBlock Text="{Binding EtaString}" Foreground="{DynamicResource ColorTextPrimary}" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                            <Button Content="⏸" Style="{StaticResource AccentButtonStyle}" Padding="6,2" Margin="2,0"/>
+                                                            <Button Content="❌" Style="{StaticResource AccentButtonStyle}" Padding="6,2" Margin="2,0" Background="#960000"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    
+                                                    <!-- نوار پیشرفت واقعی (اگر فعال نبود خالی و خاموش است) -->
+                                                    <ProgressBar Grid.Row="1" Height="8" Margin="0,8,0,0" Background="{DynamicResource ColorProgressBackground}" Foreground="{DynamicResource ColorAccent}" Value="{Binding ProgressValue}" Maximum="100"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListView>
+                            </Grid>
                         </Border>
                     </Grid>
                 </Grid>
             </TabItem>
 
-            <!-- تب چت رمزنگاری شده -->
+            <!-- ب) بخش پوشه‌های اشتراکی سیستم با کنترل کامل و امنیت هدفمند -->
+            <TabItem Header="My Shared Folders">
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- پانل ایجاد پوشه اشتراکی جدید به صورت عمومی یا خصوصی -->
+                    <Border Grid.Row="0" Style="{StaticResource ModernCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="{DynamicResource BtnAddShare}" Style="{StaticResource AccentButtonStyle}" Click="BtnAddShare_Click" Margin="0,0,10,0"/>
+                            
+                            <!-- انتخاب نوع اشتراک‌گذاری -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
+                                <TextBlock Text="Share Type: " Foreground="{DynamicResource ColorTextSecondary}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <ComboBox x:Name="CmbShareType" Width="100" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}">
+                                    <ComboBoxItem Content="Public" IsSelected="True"/>
+                                    <ComboBoxItem Content="Private"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- لیست کارت‌های زیبای پوشه‌های اشتراک گذاشته شده -->
+                    <ListBox x:Name="LstMyShares" Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="0,10,0,0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ModernCardStyle}" Width="1000" HorizontalAlignment="Left">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding FolderName}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource ColorAccent}"/>
+                                            <TextBlock Text="{Binding FolderPath}" FontSize="11" Foreground="{DynamicResource ColorTextSecondary}" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                        
+                                        <!-- برچسب امنیتی اشتراک عمومی یا اختصاصی -->
+                                        <Border Grid.Column="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center" Margin="0,0,15,0" Background="{DynamicResource ColorProgressBackground}">
+                                            <TextBlock Text="Public Share" FontSize="11" Foreground="{DynamicResource ColorTextPrimary}"/>
+                                        </Border>
+
+                                        <!-- دکمه مکث اشتراک‌گذاری موقت -->
+                                        <Button Grid.Column="2" Content="Pause" Style="{StaticResource AccentButtonStyle}" Background="#3A3A3C" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <!-- دکمه حذف کامل اشتراک -->
+                                        <Button Grid.Column="3" Content="Remove" Style="{StaticResource AccentButtonStyle}" Background="#960000" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+
+            <!-- ج) چت روم امن با قابلیت تراز اتوماتیک فارسی/انگلیسی و اموجی -->
             <TabItem Header="{DynamicResource TabChat}">
                 <Grid Margin="0,10,0,0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
-                    <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
-                        <RichTextBox x:Name="RtbChatLog" Background="Transparent" Foreground="White" BorderThickness="0" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+
+                    <!-- سلکتور چت خصوصی/گروهی -->
+                    <Border Grid.Row="0" Style="{StaticResource ModernCardStyle}" Padding="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="180"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Chat Destination: " VerticalAlignment="Center" Foreground="{DynamicResource ColorTextPrimary}" Margin="0,0,10,0"/>
+                            <ComboBox x:Name="CmbChatTarget" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}">
+                                <ComboBoxItem Content="Group Chat" IsSelected="True"/>
+                            </ComboBox>
+                        </Grid>
                     </Border>
                     
-                    <Grid Grid.Row="1">
+                    <!-- کادر بزرگ گفتگو مجهز به پشتیبانی کامل از استایل‌ها و اموجی -->
+                    <Border Grid.Row="1" Style="{StaticResource ModernCardStyle}">
+                        <RichTextBox x:Name="RtbChatLog" Background="Transparent" Foreground="{DynamicResource ColorTextPrimary}" BorderThickness="0" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontFamily="Segoe UI, Tahoma"/>
+                    </Border>
+                    
+                    <!-- کادر ورود پیام -->
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="TxtMessageInput" Grid.Column="0" Background="#1E1E1E" Foreground="White" BorderBrush="#2D2D30" BorderThickness="1" Padding="10" Margin="0,0,10,0"/>
-                        <Button Grid.Column="1" Content="{DynamicResource BtnSend}" Style="{StaticResource ModernButtonStyle}" Width="100" Click="BtnSendChat_Click"/>
+                        <TextBox x:Name="TxtMessageInput" Grid.Column="0" Background="{DynamicResource ColorCardBackground}" Foreground="{DynamicResource ColorTextPrimary}" BorderBrush="{DynamicResource ColorCardBorder}" BorderThickness="1" Padding="12" FontSize="13" Margin="0,0,10,0" FontFamily="Segoe UI, Tahoma"/>
+                        <Button Grid.Column="1" Content="{DynamicResource BtnSend}" Style="{StaticResource AccentButtonStyle}" Width="120" Click="BtnSendChat_Click"/>
                     </Grid>
                 </Grid>
             </TabItem>
 
-            <!-- تب تنظیمات کلی -->
+            <!-- د) بخش تنظیمات و شخصی‌سازی پوسته و زبان -->
             <TabItem Header="{DynamicResource TabSettings}">
-                <Border Style="{StaticResource CardBorderStyle}" Margin="0,10,0,0">
+                <Border Style="{StaticResource ModernCardStyle}" Margin="0,10,0,0">
                     <StackPanel>
-                        <TextBlock Text="{DynamicResource HeadingPreferences}" FontSize="18" FontWeight="Bold" Margin="0,0,0,20" Foreground="#0078D4"/>
+                        <TextBlock Text="{DynamicResource HeadingPreferences}" FontSize="18" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource ColorAccent}"/>
 
                         <!-- انتخاب زبان -->
                         <Grid Margin="0,0,0,15">
@@ -204,10 +328,23 @@
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="200"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelLanguage}" VerticalAlignment="Center" FontSize="14"/>
-                            <ComboBox x:Name="CmbLanguage" Grid.Column="1" Background="#2D2D30" Foreground="White" Padding="5" SelectionChanged="CmbLanguage_SelectionChanged">
+                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelLanguage}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
+                            <ComboBox x:Name="CmbLanguage" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}" Padding="5" SelectionChanged="CmbLanguage_SelectionChanged">
                                 <ComboBoxItem Content="English" IsSelected="True"/>
                                 <ComboBoxItem Content="فارسی"/>
+                            </ComboBox>
+                        </Grid>
+
+                        <!-- انتخاب پوسته هوشمند دارک/لایت -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelTheme}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
+                            <ComboBox x:Name="CmbTheme" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}" Padding="5" SelectionChanged="CmbTheme_SelectionChanged">
+                                <ComboBoxItem Content="Dark Mode" IsSelected="True"/>
+                                <ComboBoxItem Content="Light Mode"/>
                             </ComboBox>
                         </Grid>
 
@@ -217,12 +354,12 @@
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="200"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelAutoSmb}" VerticalAlignment="Center" FontSize="14"/>
+                            <TextBlock Grid.Column="0" Text="{DynamicResource LabelAutoSmb}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <CheckBox x:Name="ChkSmbStatus" Grid.Column="1" VerticalAlignment="Center" Checked="ChkSmb_Checked" Unchecked="ChkSmb_Unchecked"/>
                         </Grid>
 
                         <!-- بررسی به روز رسانی -->
-                        <Button Content="{DynamicResource BtnCheckUpdate}" Style="{StaticResource ModernButtonStyle}" Width="200" HorizontalAlignment="Left" Margin="0,20,0,0" Click="BtnCheckUpdates_Click"/>
+                        <Button Content="{DynamicResource BtnCheckUpdate}" Style="{StaticResource AccentButtonStyle}" Width="200" HorizontalAlignment="Left" Margin="0,20,0,0" Click="BtnCheckUpdates_Click"/>
                     </StackPanel>
                 </Border>
             </TabItem>
