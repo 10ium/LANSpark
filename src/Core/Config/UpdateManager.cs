@@ -2,9 +2,11 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Text; // رفع خطای نبود کلاس Encoding در زمان بیلد
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Generic; // پشتیبانی رسمی از کلکسیون لیست‌ها
 
 namespace LANSpark.Core.Config
 {
