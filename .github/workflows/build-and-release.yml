@@ -1,0 +1,41 @@
+name: Build and Release Windows App
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    # استخراج ورژن مستقیم از روی تگ گیت‌هاب و تزریق آن به کامپایلر به کمک سوئیچ -p:Version
+    - name: Publish App
+      shell: pwsh
+      run: |
+        $version = "${{ github.ref_name }}".Replace("v", "")
+        dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:Version=$version -o ./publish
+
+    - name: Create Zip Package
+      shell: pwsh
+      run: |
+        Compress-Archive -Path ./publish/* -DestinationPath ./FileShareApp-Windows-Portable.zip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./FileShareApp-Windows-Portable.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
