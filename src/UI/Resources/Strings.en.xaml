@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Metadata & App Info -->
+    <system:String x:Key="AppName">LANSpark</system:String>
+    <system:String x:Key="Subtitle">Ultra-Fast &amp; Secure LAN Share</system:String>
+
+    <!-- Navigation Tabs -->
+    <system:String x:Key="TabTransfer">File Transfer</system:String>
+    <system:String x:Key="TabChat">Secure Chat</system:String>
+    <system:String x:Key="TabSettings">Settings</system:String>
+    <system:String x:Key="TabDiagnostics">Diagnostics</system:String>
+
+    <!-- Transfer & Sharing Section -->
+    <system:String x:Key="LabelComputerName">Computer Name:</system:String>
+    <system:String x:Key="LabelIpAddress">IP Address:</system:String>
+    <system:String x:Key="BtnCopy">Copy</system:String>
+    <system:String x:Key="BtnAddShare">Share Folder</system:String>
+    <system:String x:Key="BtnSearch">Search</system:String>
+    <system:String x:Key="TxtSearchPlaceholder">Search shared files...</system:String>
+    
+    <!-- Transfer Grid Headers -->
+    <system:String x:Key="ColFileName">File Name</system:String>
+    <system:String x:Key="ColProgress">Progress</system:String>
+    <system:String x:Key="ColSpeed">Speed</system:String>
+    <system:String x:Key="ColStatus">Status</system:String>
+
+    <!-- Control Buttons -->
+    <system:String x:Key="BtnPause">Pause</system:String>
+    <system:String x:Key="BtnResume">Resume</system:String>
+    <system:String x:Key="BtnCancel">Cancel</system:String>
+
+    <!-- Chat Section -->
+    <system:String x:Key="LabelSecureChat">End-to-End Encrypted Chat (TLS 1.3)</system:String>
+    <system:String x:Key="TxtChatPlaceholder">Type a secure message here...</system:String>
+    <system:String x:Key="BtnSend">Send</system:String>
+    <system:String x:Key="ChatConnected">Secure channel established.</system:String>
+
+    <!-- Settings Section -->
+    <system:String x:Key="HeadingPreferences">Preferences</system:String>
+    <system:String x:Key="LabelLanguage">Language:</system:String>
+    <system:String x:Key="LabelTheme">App Theme:</system:String>
+    <system:String x:Key="LabelAutoSmb">Windows SMB Auto-Share:</system:String>
+    <system:String x:Key="BtnCheckUpdate">Check for Updates</system:String>
+    <system:String x:Key="BtnSaveSettings">Save Settings</system:String>
+
+    <!-- Statuses -->
+    <system:String x:Key="StatusEnabled">Enabled</system:String>
+    <system:String x:Key="StatusDisabled">Disabled</system:String>
+    <system:String x:Key="StatusCopied">Copied to Clipboard!</system:String>
+    <system:String x:Key="MsgCheckingUpdates">Checking for updates...</system:String>
+    <system:String x:Key="MsgNewVersionFound">New version available! Do you want to download?</system:String>
+    <system:String x:Key="MsgNoUpdate">You are using the latest version.</system:String>
+
+</ResourceDictionary>
