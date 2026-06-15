@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- ۱. تنظیم بستر اجرا روی محیط ویندوز و دات‌نت ۸ -->
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms> <!-- جهت باز شدن پنجره انتخاب پوشه اشتراکی -->
+    
+    <!-- ۲. تنظیم نام رسمی خروجی فایل اجرایی و دامنه پروژه -->
+    <AssemblyName>LANSpark</AssemblyName>
+    <RootNamespace>LANSpark</RootNamespace>
+    
+    <!-- ۳. مشخص کردن مسیر آیکون اصلی نرم‌افزار جهت حک شدن روی فایل EXE -->
+    <ApplicationIcon>UI\Resources\app_icon.ico</ApplicationIcon>
+    
+    <!-- اطلاعات بیلد نرم‌افزار -->
+    <Authors>LANSpark Team</Authors>
+    <Company>LANSpark Inc.</Company>
+    <Product>LANSpark File Share &amp; Secure Chat</Product>
+    <Description>Enterprise-Grade Multi-Connection LAN Sharing with End-to-End TLS 1.3 Chat</Description>
+  </PropertyGroup>
+
+  <!-- ۴. معرفی فایل‌های ترجمه و آیکون به عنوان منابع گرافیکی ثابت (Page/Resource) -->
+  <ItemGroup>
+    <Resource Include="UI\Resources\app_icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Page Include="UI\Resources\Strings.en.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Resources\Strings.fa.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>
