@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- اطلاعات متادیتا و برنامه -->
+    <system:String x:Key="AppName">LANSpark</system:String>
+    <system:String x:Key="Subtitle">انتقال فایل فوق‌سریع و چت امن محلی</system:String>
+
+    <!-- تب‌های ناوبری اصلی -->
+    <system:String x:Key="TabTransfer">انتقال فایل</system:String>
+    <system:String x:Key="TabChat">چت امن</system:String>
+    <system:String x:Key="TabSettings">تنظیمات</system:String>
+    <system:String x:Key="TabDiagnostics">عیب‌یابی شبکه</system:String>
+
+    <!-- بخش انتقال و اشتراک‌گذاری -->
+    <system:String x:Key="LabelComputerName">نام کامپیوتر:</system:String>
+    <system:String x:Key="LabelIpAddress">آدرس آی‌پی (LAN):</system:String>
+    <system:String x:Key="BtnCopy">کپی</system:String>
+    <system:String x:Key="BtnAddShare">اشتراک‌گذاری پوشه جدید</system:String>
+    <system:String x:Key="BtnSearch">جستجو</system:String>
+    <system:String x:Key="TxtSearchPlaceholder">جستجو در فایل‌های به اشتراک گذاشته شده...</system:String>
+    
+    <!-- عناوین جدول انتقال فایل‌ها -->
+    <system:String x:Key="ColFileName">نام فایل</system:String>
+    <system:String x:Key="ColProgress">میزان پیشرفت</system:String>
+    <system:String x:Key="ColSpeed">سرعت انتقال</system:String>
+    <system:String x:Key="ColStatus">وضعیت</system:String>
+
+    <!-- دکمه‌های کنترلی ترنسفر -->
+    <system:String x:Key="BtnPause">توقف موقت</system:String>
+    <system:String x:Key="BtnResume">ادامه انتقال</system:String>
+    <system:String x:Key="BtnCancel">لغو عملیات</system:String>
+
+    <!-- بخش چت و گفتگو -->
+    <system:String x:Key="LabelSecureChat">چت محلی رمزنگاری شده مبدا به مقصد (TLS 1.3)</system:String>
+    <system:String x:Key="TxtChatPlaceholder">پیام امن خود را بنویسید...</system:String>
+    <system:String x:Key="BtnSend">ارسال پیام</system:String>
+    <system:String x:Key="ChatConnected">کانال چت امن با موفقیت باز شد.</system:String>
+
+    <!-- بخش تنظیمات برگزیده -->
+    <system:String x:Key="HeadingPreferences">تنظیمات کاربری</system:String>
+    <system:String x:Key="LabelLanguage">انتخاب زبان:</system:String>
+    <system:String x:Key="LabelTheme">پوسته برنامه:</system:String>
+    <system:String x:Key="LabelAutoSmb">اشتراک‌گذاری خودکار پوشه ویندوز (SMB):</system:String>
+    <system:String x:Key="BtnCheckUpdate">بررسی نسخه‌های جدید</system:String>
+    <system:String x:Key="BtnSaveSettings">ذخیره نهایی تنظیمات</system:String>
+
+    <!-- کلمات وضعیت و اعلان‌ها -->
+    <system:String x:Key="StatusEnabled">فعال</system:String>
+    <system:String x:Key="StatusDisabled">غیرفعال</system:String>
+    <system:String x:Key="StatusCopied">با موفقیت کپی شد!</system:String>
+    <system:String x:Key="MsgCheckingUpdates">در حال بررسی سرور گیت‌هاب جهت آپدیت جدید...</system:String>
+    <system:String x:Key="MsgNewVersionFound">نسخه جدید نرم‌افزار یافت شد! مایل به دانلود و نصب خودکار هستید؟</system:String>
+    <system:String x:Key="MsgNoUpdate">شما در حال استفاده از آخرین نسخه نرم‌افزار هستید.</system:String>
+
+</ResourceDictionary>
