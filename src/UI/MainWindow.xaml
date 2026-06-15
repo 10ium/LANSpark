@@ -176,8 +176,8 @@
                                             <Border Background="{DynamicResource ColorAppBackground}" CornerRadius="6" Padding="12" Margin="0,4" BorderThickness="1" BorderBrush="{DynamicResource ColorCardBorder}">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
+                                                        <Grid.RowDefinitions Height="Auto"/>
+                                                        <Grid.RowDefinitions Height="Auto"/>
                                                     </Grid.RowDefinitions>
                                                     
                                                     <!-- سطر اطلاعات متادیتا دانلود -->
@@ -199,12 +199,12 @@
                                                         </StackPanel>
                                                     </Grid>
                                                     
-                                                    <!-- نوار پیشرفت واقعی (اگر فعال نبود خالی و خاموش است) -->
+                                                    <!-- نوار پیشرفت واقعی -->
                                                     <ProgressBar Grid.Row="1" Height="8" Margin="0,8,0,0" Background="{DynamicResource ColorProgressBackground}" Foreground="{DynamicResource ColorAccent}" Value="{Binding ProgressValue}" Maximum="100"/>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
-                                    </ListBox.ItemTemplate>
+                                    </ListView.ItemTemplate> <!-- اصلاح تگ غیرهمسان در اینجا -->
                                 </ListView>
                             </Grid>
                         </Border>
@@ -325,8 +325,8 @@
                         <!-- انتخاب زبان -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="200"/>
+                                <Grid.ColumnDefinitions Width="200"/>
+                                <Grid.ColumnDefinitions Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{DynamicResource LabelLanguage}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <ComboBox x:Name="CmbLanguage" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}" Padding="5" SelectionChanged="CmbLanguage_SelectionChanged">
@@ -338,8 +338,8 @@
                         <!-- انتخاب پوسته هوشمند دارک/لایت -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="200"/>
+                                <Grid.ColumnDefinitions Width="200"/>
+                                <Grid.ColumnDefinitions Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{DynamicResource LabelTheme}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <ComboBox x:Name="CmbTheme" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}" Padding="5" SelectionChanged="CmbTheme_SelectionChanged">
@@ -351,8 +351,8 @@
                         <!-- مدیریت وضعیت اشتراک ویندوز SMB -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="200"/>
+                                <Grid.ColumnDefinitions Width="200"/>
+                                <Grid.ColumnDefinitions Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{DynamicResource LabelAutoSmb}" VerticalAlignment="Center" FontSize="14" Foreground="{DynamicResource ColorTextPrimary}"/>
                             <CheckBox x:Name="ChkSmbStatus" Grid.Column="1" VerticalAlignment="Center" Checked="ChkSmb_Checked" Unchecked="ChkSmb_Unchecked"/>
