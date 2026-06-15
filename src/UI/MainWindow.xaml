@@ -176,8 +176,8 @@
                                             <Border Background="{DynamicResource ColorAppBackground}" CornerRadius="6" Padding="12" Margin="0,4" BorderThickness="1" BorderBrush="{DynamicResource ColorCardBorder}">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
-                                                        <Grid.RowDefinitions Height="Auto"/>
-                                                        <Grid.RowDefinitions Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
                                                     
                                                     <!-- سطر اطلاعات متادیتا دانلود -->
@@ -204,7 +204,7 @@
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
-                                    </ListView.ItemTemplate> <!-- اصلاح تگ غیرهمسان در اینجا -->
+                                    </ListView.ItemTemplate>
                                 </ListView>
                             </Grid>
                         </Border>
@@ -290,7 +290,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="180"/>
+                                <Grid.ColumnDefinitions Width="180"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Chat Destination: " VerticalAlignment="Center" Foreground="{DynamicResource ColorTextPrimary}" Margin="0,0,10,0"/>
                             <ComboBox x:Name="CmbChatTarget" Grid.Column="1" Background="{DynamicResource ColorAppBackground}" Foreground="{DynamicResource ColorTextPrimary}">
