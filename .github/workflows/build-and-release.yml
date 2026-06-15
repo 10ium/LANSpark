@@ -3,8 +3,8 @@ name: Build and Release LANSpark
 on:
   push:
     tags:
-      - 'v*' # اجرای خودکار با ثبت تگ جدید مانند v1.0.0
-  workflow_dispatch: # فعال‌سازی دکمه اجرای دستی (Run Workflow) در پنل گیت‌هاب
+      - 'v*'
+  workflow_dispatch:
     inputs:
       custom_version:
         description: 'Manual Version Number (e.g., 1.0.0)'
@@ -24,10 +24,65 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
+    # ایجاد پوشه منابع و خلق پویا و هنری آیکون LANSpark به صورت باینری قبل از کامپایل
+    - name: Generate Dynamic App Icon
+      shell: pwsh
+      run: |
+        # ۱. ساخت دایرکتوری در صورت عدم وجود
+        New-Item -ItemType Directory -Force -Path src/UI/Resources/
+
+        # ۲. استفاده از کتابخانه گرافیکی ویندوز برای طراحی اختصاصی آیکون
+        Add-Type -AssemblyName System.Drawing
+        $bmp = New-Object System.Drawing.Bitmap 32, 32
+        $g = [System.Drawing.Graphics]::FromImage($bmp)
+        $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+        
+        # رنگ‌آمیزی پس‌زمینه با تم تاریک برنامه (#121212)
+        $g.Clear([System.Drawing.Color]::FromArgb(255, 18, 18, 18))
+        
+        # رسم یک دایره لوکس با تم آبی فلوئنت ویندوز (#0078D4)
+        $brushCircle = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 0, 120, 212))
+        $g.FillEllipse($brushCircle, 2, 2, 28, 28)
+        
+        # نوشتن حرف اول نام نرم‌افزار "L" در مرکز دایره با رنگ سفید مجلل
+        $font = New-Object System.Drawing.Font "Segoe UI", 15, [System.Drawing.FontStyle]::Bold
+        $brushText = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::White)
+        $g.DrawString("L", $font, $brushText, 8, 3)
+        
+        # ذخیره خروجی موقت به عنوان PNG
+        $tmpPng = "temp_icon.png"
+        $bmp.Save($tmpPng, [System.Drawing.Imaging.ImageFormat]::Png)
+        $g.Dispose()
+        $bmp.Dispose()
+
+        # ۳. بسته‌بندی فایل PNG درون فرمت استاندارد آیکون ویندوز (ICO Wrapper)
+        $pngBytes = [System.IO.File]::ReadAllBytes($tmpPng)
+        $icoStream = New-Object System.IO.FileStream "src/UI/Resources/app_icon.ico", Create
+        $binaryWriter = New-Object System.IO.BinaryWriter $icoStream
+        
+        # نوشتن هدر استاندارد ICO
+        $binaryWriter.Write([UInt16]0)
+        $binaryWriter.Write([UInt16]1)
+        $binaryWriter.Write([UInt16]1)
+        $binaryWriter.Write([Byte]32) # عرض ۳۲ پیکسل
+        $binaryWriter.Write([Byte]32) # ارتفاع ۳۲ پیکسل
+        $binaryWriter.Write([Byte]0)
+        $binaryWriter.Write([Byte]0)
+        $binaryWriter.Write([UInt16]1)
+        $binaryWriter.Write([UInt16]32)
+        $binaryWriter.Write([UInt32]$pngBytes.Length)
+        $binaryWriter.Write([UInt32]22) # آفست داده‌ها
+        $binaryWriter.Write($pngBytes)
+        
+        $binaryWriter.Close()
+        $icoStream.Close()
+        Remove-Item $tmpPng
+        
+        Write-Host "Success: Dynamic LANSpark Icon Created Successfully!"
+
     - name: Restore Dependencies
       run: dotnet restore src/LANSpark.csproj
 
-    # تشخیص هوشمند شماره نسخه بر اساس نوع اجرا (دستی یا خودکار با تگ)
     - name: Determine Version
       id: get_version
       shell: pwsh
@@ -39,19 +94,16 @@ jobs:
         }
         echo "BUILD_VERSION=$ver" >> $env:GITHUB_ENV
 
-    # کامپایل برنامه به صورت یک فایل منفرد با تزریق نسخه و آیکون اختصاصی
     - name: Publish App
       shell: pwsh
       run: |
         dotnet publish src/LANSpark.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:Version=${{ env.BUILD_VERSION }} -o ./publish
 
-    # فشرده‌سازی پکیج جهت انتشار پرتابل
     - name: Create Zip Package
       shell: pwsh
       run: |
         Compress-Archive -Path ./publish/* -DestinationPath ./LANSpark-v${{ env.BUILD_VERSION }}-Portable.zip
 
-    # ساخت ریلیز در گیت‌هاب و آپلود پکیج
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
