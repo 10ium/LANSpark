@@ -12,6 +12,15 @@ using LANSpark.Core.Sharing;
 
 namespace LANSpark.UI
 {
+    // کلاس کمکی برای نگه‌داری وضعیت زنده صف دانلودهای موازی
+    public class DownloadJob
+    {
+        public string FileName { get; set; } = string.Empty;
+        public int ProgressValue { get; set; }
+        public string SpeedString { get; set; } = "0 KB/s";
+        public string EtaString { get; set; } = "Calculating...";
+    }
+
     public partial class MainWindow : Window
     {
         private readonly AppConfig _config;
@@ -22,14 +31,14 @@ namespace LANSpark.UI
         private readonly SecureChatService _chatService;
         private readonly UpdateManager _updateManager;
 
-        // لیست پویا با قابلیت به‌روزرسانی لحظه‌ای رابط کاربری
         public ObservableCollection<PeerDevice> OnlinePeers { get; } = new();
+        public ObservableCollection<DownloadJob> ActiveDownloads { get; } = new();
+        public ObservableCollection<SharedFolder> MySharedFolders { get; } = new();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // ۱. راه‌اندازی و لود زیرسیستم‌ها
             _config = AppConfig.Load();
             _networkEngine = new NetworkEngine(_config);
             _discoveryService = new PeerDiscoveryService(_config);
@@ -38,32 +47,61 @@ namespace LANSpark.UI
             _chatService = new SecureChatService(_config);
             _updateManager = new UpdateManager();
 
-            // انتساب دیتای آنلاین کلاینت‌ها به لیست باکس روی فرم
             LstPeers.ItemsSource = OnlinePeers;
+            LstDownloadsQueue.ItemsSource = ActiveDownloads;
+            LstMyShares.ItemsSource = MySharedFolders;
 
-            // ۲. ثبت رویدادهای شبکه و چت
             _discoveryService.OnPeersListChanged += OnPeersChanged;
             _chatService.OnMessageReceived += OnChatReceived;
 
-            // ۳. آغاز به کار سرورها
             _networkEngine.StartServer();
             _discoveryService.StartDiscovery();
             _shareManager.StartServer();
             _chatService.StartChatServer();
 
-            // ۴. لود تنظیمات اولیه بر روی فرم گرافیکی
             InitializeUiState();
         }
 
         private void InitializeUiState()
         {
-            TxtLocalName.Text = string.IsNullOrEmpty(_config.DefaultWindowsShareName) ? Environment.MachineName : _config.DefaultWindowsShareName;
+            TxtLocalName.Text = Environment.MachineName;
+            TxtLocalIp.Text = "Scanning...";
             ChkSmbStatus.IsChecked = _smbManager.IsShareActive();
             CmbLanguage.SelectedIndex = _config.Language == "fa" ? 1 : 0;
+            CmbTheme.SelectedIndex = _config.AppTheme == "Light" ? 1 : 0;
+            
             ApplyLanguageDictionary(_config.Language);
+            ApplyThemeDictionary(_config.AppTheme);
+            RefreshMySharedFoldersList();
+            CheckPeersStatusAndShowWarning();
         }
 
-        // ۵. مکانیزم جابه‌جایی داینامیک زبان‌ها در زمان اجرا (Run-time Translation)
+        // ۱. مکانیزم جابه‌جایی داینامیک تم‌های تیره و روشن (Dark/Light Dynamic Swapping)
+        private void ApplyThemeDictionary(string themeName)
+        {
+            try
+            {
+                var dictionary = new ResourceDictionary();
+                string path = themeName == "Light" 
+                    ? "pack://application:,,,/UI/Resources/Theme.Light.xaml" 
+                    : "pack://application:,,,/UI/Resources/Theme.Dark.xaml";
+
+                dictionary.Source = new Uri(path, UriKind.Absolute);
+
+                // بازسازی استایل‌های منابع برنامه بدون ایجاد تداخل با دیکشنری متون چندزبانه
+                var existingTheme = this.Resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Theme"));
+                if (existingTheme != null)
+                {
+                    this.Resources.MergedDictionaries.Remove(existingTheme);
+                }
+                this.Resources.MergedDictionaries.Add(dictionary);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Theme loading error: {ex.Message}");
+            }
+        }
+
         private void ApplyLanguageDictionary(string langCode)
         {
             try
@@ -75,11 +113,13 @@ namespace LANSpark.UI
 
                 dictionary.Source = new Uri(path, UriKind.Absolute);
 
-                // جایگزینی فرهنگ لغات جدید در منابع جاری برنامه
-                this.Resources.MergedDictionaries.Clear();
+                var existingLang = this.Resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Strings"));
+                if (existingLang != null)
+                {
+                    this.Resources.MergedDictionaries.Remove(existingLang);
+                }
                 this.Resources.MergedDictionaries.Add(dictionary);
 
-                // اصلاح خطای انتساب جهت صفحه با آدرس صریح متغیرهای جهت ویندوز
                 this.FlowDirection = langCode == "fa" 
                     ? System.Windows.FlowDirection.RightToLeft 
                     : System.Windows.FlowDirection.LeftToRight;
@@ -90,29 +130,41 @@ namespace LANSpark.UI
             }
         }
 
-        // ۶. دریافت رویداد تغییرات سیستم‌های شبکه و به‌روزرسانی زنده لیست
+        // ۲. پایش هوشمند کلاینت‌ها و فعال‌سازی کادر هشدار عدم اتصال شبکه محلی
         private void OnPeersChanged()
         {
             Dispatcher.Invoke(() =>
             {
                 OnlinePeers.Clear();
+                CmbChatTarget.Items.Clear();
+                CmbChatTarget.Items.Add("Group Chat");
+                CmbChatTarget.SelectedIndex = 0;
+
                 foreach (var peer in _discoveryService.DiscoveredPeers.Values)
                 {
                     OnlinePeers.Add(peer);
+                    CmbChatTarget.Items.Add(peer.CustomName);
                 }
+
+                CheckPeersStatusAndShowWarning();
             });
         }
 
-        // ۷. رفع ابهامات کپی آدرس آی‌پی با ارجاع صریح به کلیپ‌بورد و مسیج‌باکس WPF
-        private void BtnCopyIp_Click(object sender, RoutedEventArgs e)
+        private void CheckPeersStatusAndShowWarning()
         {
-            System.Windows.Clipboard.SetText(TxtLocalName.Text);
-            System.Windows.MessageBox.Show((string)this.FindResource("StatusCopied"), "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (OnlinePeers.Count == 0)
+            {
+                BrdNoNetworkWarn.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                BrdNoNetworkWarn.Visibility = System.Windows.Visibility.Collapsed;
+            }
         }
 
         private void BtnCopyPeerIp_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as System.Windows.Controls.Button; // رفع ابهام دکمه
+            var button = sender as System.Windows.Controls.Button;
             string? ip = button?.CommandParameter as string;
             if (!string.IsNullOrEmpty(ip))
             {
@@ -121,44 +173,62 @@ namespace LANSpark.UI
             }
         }
 
-        // ۸. مدیریت اشتراک‌گذاری پوشه محلی سفارشی جدید
+        // ۳. مدیریت اشتراک‌گذاری‌های محلی کلاینت
+        private void RefreshMySharedFoldersList()
+        {
+            MySharedFolders.Clear();
+            foreach (var folder in _config.SharedFolders)
+            {
+                MySharedFolders.Add(folder);
+            }
+        }
+
         private void BtnAddShare_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    string path = dialog.SelectedPath;
-                    if (!_config.LocalSharedDirectories.Contains(path))
+                    bool isPublic = CmbShareType.SelectedIndex == 0;
+                    var newFolder = new SharedFolder
                     {
-                        _config.LocalSharedDirectories.Add(path);
-                        _config.Save();
-                        System.Windows.MessageBox.Show("Folder shared successfully within the app!", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
+                        FolderPath = dialog.SelectedPath,
+                        IsPublic = isPublic
+                    };
+
+                    _config.SharedFolders.Add(newFolder);
+                    _config.Save();
+                    RefreshMySharedFoldersList();
+                    System.Windows.MessageBox.Show("Folder Shared Successfully!", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
 
-        // ۹. بخش پیام‌رسانی امن (ارسال و دریافت رمزنگاری شده)
+        // ۴. بخش چت پیشرفته رمزنگاری شده با تراز خودکار فارسی/انگلیسی (Auto RTL)
         private async void BtnSendChat_Click(object sender, RoutedEventArgs e)
         {
             string message = TxtMessageInput.Text;
             if (string.IsNullOrWhiteSpace(message)) return;
 
-            var selectedPeer = LstPeers.SelectedItem as PeerDevice;
-            if (selectedPeer == null)
-            {
-                System.Windows.MessageBox.Show("Please select a target computer from the list first.", "LANSpark", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
             TxtMessageInput.Clear();
-            AppendChatMessage("Me", message, System.Windows.Media.Brushes.LightSkyBlue);
+            AppendChatMessage("Me", message, System.Windows.Media.Brushes.LightSkyBlue, true);
 
-            bool success = await _chatService.SendMessageSecurelyAsync(selectedPeer.IpAddress, message);
-            if (!success)
+            // بررسی حالت خصوصی یا گروهی ارسال پیام چت
+            if (CmbChatTarget.SelectedIndex == 0) // ارسال به گروه (برودکست)
             {
-                AppendChatMessage("System", "Failed to send message. Peer might be offline.", System.Windows.Media.Brushes.Red);
+                foreach (var peer in OnlinePeers)
+                {
+                    await _chatService.SendMessageSecurelyAsync(peer.IpAddress, message);
+                }
+            }
+            else // ارسال خصوصی به کلاینت منتخب
+            {
+                string targetName = CmbChatTarget.SelectedItem.ToString() ?? "";
+                var peer = OnlinePeers.FirstOrDefault(p => p.CustomName == targetName);
+                if (peer != null)
+                {
+                    await _chatService.SendMessageSecurelyAsync(peer.IpAddress, message);
+                }
             }
         }
 
@@ -166,23 +236,37 @@ namespace LANSpark.UI
         {
             Dispatcher.Invoke(() =>
             {
-                AppendChatMessage(message.SenderName, message.MessageText, System.Windows.Media.Brushes.LightGreen);
+                AppendChatMessage(message.SenderName, message.MessageText, System.Windows.Media.Brushes.LightGreen, false);
             });
         }
 
-        // رفع خطای تداخل قلم‌موها با استفاده از آدرس صریح سیستم ترسیم گرافیک WPF
-        private void AppendChatMessage(string sender, string text, System.Windows.Media.Brush color)
+        // متد هوشمند تشخیص جهت و تراز متن چت بر پایه یونیکد کلمات غالب جمله
+        private void AppendChatMessage(string sender, string text, System.Windows.Media.Brush color, bool isMe)
         {
             Paragraph para = new Paragraph();
+
+            // تشخیص وجود کاراکترهای پارسی در بدنه متن پیام چت
+            bool isFarsi = IsMostlyFarsi(text);
+            para.TextAlignment = isFarsi ? System.Windows.TextAlignment.Right : System.Windows.TextAlignment.Left;
+
             Run nameRun = new Run($"[{sender}] {DateTime.Now.ToShortTimeString()}: ") { Foreground = color, FontWeight = FontWeights.Bold };
             Run textRun = new Run(text) { Foreground = System.Windows.Media.Brushes.White };
+            
             para.Inlines.Add(nameRun);
             para.Inlines.Add(textRun);
             RtbChatLog.Document.Blocks.Add(para);
             RtbChatLog.ScrollToEnd();
         }
 
-        // ۱۰. مدیریت رویداد تغییرات زنده زبان
+        private bool IsMostlyFarsi(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return false;
+            // بررسی رنج کاراکترهای حروف الفبای فارسی و عربی
+            int farsiCount = text.Count(c => (c >= 0x0600 && c <= 0x06FF) || (c >= 0xFB50 && c <= 0xFDFF));
+            return farsiCount > (text.Length / 2);
+        }
+
+        // ۵. تنظیمات زبان و تغییر پوسته داینامیک برنامه
         private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_config == null) return;
@@ -192,7 +276,15 @@ namespace LANSpark.UI
             ApplyLanguageDictionary(newLang);
         }
 
-        // ۱۱. مدیریت اشتراک‌گذاری پیش‌فرض ویندوز SMB
+        private void CmbTheme_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_config == null) return;
+            string newTheme = CmbTheme.SelectedIndex == 1 ? "Light" : "Dark";
+            _config.AppTheme = newTheme;
+            _config.Save();
+            ApplyThemeDictionary(newTheme);
+        }
+
         private void ChkSmb_Checked(object sender, RoutedEventArgs e)
         {
             if (!_smbManager.IsUserAdministrator())
@@ -212,7 +304,6 @@ namespace LANSpark.UI
             }
         }
 
-        // ۱۲. موتور بررسی آپدیت خودکار
         private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.MessageBox.Show((string)this.FindResource("MsgCheckingUpdates"), "LANSpark");
@@ -232,7 +323,6 @@ namespace LANSpark.UI
             }
         }
 
-        // ۱۳. آزاد کردن منابع در هنگام بسته شدن اپلیکیشن
         protected override void OnClosed(EventArgs e)
         {
             _networkEngine.StopServer();
