@@ -104,16 +104,17 @@ namespace LANSpark.Core.Sharing
             }
         }
 
-        // ۱. متد ارائه‌دهنده لیست فایل‌ها و پوشه‌های اشتراک گذاشته شده
+        // ۱. متد ارائه‌دهنده لیست پوشه‌های اشتراک گذاشته شده فعال (با پایش وضعیت Pause)
         private async Task HandleListRequestAsync(HttpListenerResponse response)
         {
             var items = new List<SharedItem>();
 
-            foreach (var dir in _config.LocalSharedDirectories)
+            foreach (var folder in _config.SharedFolders)
             {
-                if (Directory.Exists(dir))
+                // اگر اشتراک‌گذاری پوشه توسط کاربر متوقف (Pause) نشده باشد، سرویس‌دهی انجام می‌شود
+                if (!folder.IsPaused && Directory.Exists(folder.FolderPath))
                 {
-                    items.Add(new SharedItem { Name = Path.GetFileName(dir), Path = dir, IsDirectory = true });
+                    items.Add(new SharedItem { Name = folder.FolderName, Path = folder.FolderPath, IsDirectory = true });
                 }
             }
 
@@ -124,18 +125,18 @@ namespace LANSpark.Core.Sharing
             response.Close();
         }
 
-        // ۲. متد جستجوی پیشرفته درون فایل‌های اشتراک‌گذاری شده
+        // ۲. متد جستجوی پیشرفته درون فایل‌های فعال (عدم جستجو در پوشه‌های متوقف شده)
         private async Task HandleSearchRequestAsync(HttpListenerResponse response, string query)
         {
             var results = new List<SharedItem>();
 
             if (!string.IsNullOrWhiteSpace(query))
             {
-                foreach (var dir in _config.LocalSharedDirectories)
+                foreach (var folder in _config.SharedFolders)
                 {
-                    if (Directory.Exists(dir))
+                    if (!folder.IsPaused && Directory.Exists(folder.FolderPath))
                     {
-                        var files = Directory.GetFiles(dir, $"*{query}*", SearchOption.AllDirectories);
+                        var files = Directory.GetFiles(folder.FolderPath, $"*{query}*", SearchOption.AllDirectories);
                         foreach (var file in files)
                         {
                             var info = new FileInfo(file);
@@ -158,11 +159,13 @@ namespace LANSpark.Core.Sharing
             response.Close();
         }
 
-        // ۳. متد دانلود فوق‌سریع با پشتیبانی از هدرهای Range (دانلود چند بخش همزمان شبیه IDM)
+        // ۳. متد دانلود فوق‌سریع با پشتیبانی از هدرهای Range و لایه کنترل امنیت اشتراک‌گذاری‌های متوقف شده
         private async Task HandleDownloadRequestAsync(HttpListenerRequest request, HttpListenerResponse response, string filePath)
         {
-            // اطمینان از قرار داشتن فایل در پوشه‌های مجاز اشتراک‌گذاری شده به دلایل امنیتی
-            bool isAllowed = _config.LocalSharedDirectories.Any(dir => filePath.StartsWith(dir, StringComparison.OrdinalIgnoreCase));
+            // تایید صلاحیت دانلود: فایل باید درون یکی از پوشه‌های به اشتراک گذاشته شده فعال (غیرمتوقف) باشد
+            bool isAllowed = _config.SharedFolders.Any(folder => 
+                !folder.IsPaused && filePath.StartsWith(folder.FolderPath, StringComparison.OrdinalIgnoreCase));
+
             if (!isAllowed || !File.Exists(filePath))
             {
                 response.StatusCode = (int)HttpStatusCode.Forbidden;
@@ -180,7 +183,6 @@ namespace LANSpark.Core.Sharing
             long startByte = 0;
             long endByte = fileLength - 1;
 
-            // پردازش درخواست‌های Range جهت دانلود قطعه به قطعه
             string? rangeHeader = request.Headers["Range"];
             if (!string.IsNullOrEmpty(rangeHeader))
             {
@@ -208,7 +210,7 @@ namespace LANSpark.Core.Sharing
                 using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     fileStream.Seek(startByte, SeekOrigin.Begin);
-                    byte[] buffer = new byte[65536]; // بافر بزرگ ۶۴ کیلوبایتی جهت بهره‌وری دیسک و پردازنده
+                    byte[] buffer = new byte[65536]; 
                     long bytesRemaining = contentLength;
 
                     while (bytesRemaining > 0)
