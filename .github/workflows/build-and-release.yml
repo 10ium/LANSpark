@@ -24,7 +24,7 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    # ایجاد پوشه منابع و خلق پویا و هنری آیکون LANSpark به صورت باینری قبل از کامپایل
+    # ایجاد پوشه منابع و خلق پویا و هنری آیکون LANSpark به صورت باینری با رفع خطای کستینگ پاورشل
     - name: Generate Dynamic App Icon
       shell: pwsh
       run: |
@@ -33,7 +33,7 @@ jobs:
 
         # ۲. استفاده از کتابخانه گرافیکی ویندوز برای طراحی اختصاصی آیکون
         Add-Type -AssemblyName System.Drawing
-        $bmp = New-Object System.Drawing.Bitmap 32, 32
+        $bmp = New-Object System.Drawing.Bitmap(32, 32)
         $g = [System.Drawing.Graphics]::FromImage($bmp)
         $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
         
@@ -41,13 +41,17 @@ jobs:
         $g.Clear([System.Drawing.Color]::FromArgb(255, 18, 18, 18))
         
         # رسم یک دایره لوکس با تم آبی فلوئنت ویندوز (#0078D4)
-        $brushCircle = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 0, 120, 212))
+        $brushCircle = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255, 0, 120, 212))
         $g.FillEllipse($brushCircle, 2, 2, 28, 28)
         
-        # نوشتن حرف اول نام نرم‌افزار "L" در مرکز دایره با رنگ سفید مجلل
-        $font = New-Object System.Drawing.Font "Segoe UI", 15, [System.Drawing.FontStyle]::Bold
-        $brushText = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::White)
-        $g.DrawString("L", $font, $brushText, 8, 3)
+        # مشخص کردن نوع دقیق اعشاری (float) برای سایز و مختصات متن به منظور رفع خطای ابهام
+        $fontSize = [float]15.0
+        $font = New-Object System.Drawing.Font("Segoe UI", $fontSize, [System.Drawing.FontStyle]::Bold)
+        $brushText = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::White)
+        
+        $xCoord = [float]8.0
+        $yCoord = [float]3.0
+        $g.DrawString("L", $font, $brushText, $xCoord, $yCoord)
         
         # ذخیره خروجی موقت به عنوان PNG
         $tmpPng = "temp_icon.png"
@@ -64,21 +68,21 @@ jobs:
         $binaryWriter.Write([UInt16]0)
         $binaryWriter.Write([UInt16]1)
         $binaryWriter.Write([UInt16]1)
-        $binaryWriter.Write([Byte]32) # عرض ۳۲ پیکسل
-        $binaryWriter.Write([Byte]32) # ارتفاع ۳۲ پیکسل
+        $binaryWriter.Write([Byte]32)
+        $binaryWriter.Write([Byte]32)
         $binaryWriter.Write([Byte]0)
         $binaryWriter.Write([Byte]0)
         $binaryWriter.Write([UInt16]1)
         $binaryWriter.Write([UInt16]32)
         $binaryWriter.Write([UInt32]$pngBytes.Length)
-        $binaryWriter.Write([UInt32]22) # آفست داده‌ها
+        $binaryWriter.Write([UInt32]22)
         $binaryWriter.Write($pngBytes)
         
         $binaryWriter.Close()
         $icoStream.Close()
         Remove-Item $tmpPng
         
-        Write-Host "Success: Dynamic LANSpark Icon Created Successfully!"
+        Write-Host "Success: Dynamic LANSpark Icon Created Successfully without Ambiguity!"
 
     - name: Restore Dependencies
       run: dotnet restore src/LANSpark.csproj
